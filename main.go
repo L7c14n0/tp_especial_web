@@ -24,6 +24,7 @@ func manejador404(fileServer http.Handler) http.Handler {
 
 		if err != nil {
 			if os.IsNotExist(err) {
+				w.Header().Set("Content-Type", "text/html; charset=utf-8")
 				w.WriteHeader(http.StatusNotFound)
 				http.ServeFile(w, r, "./static/404.html")
 				return

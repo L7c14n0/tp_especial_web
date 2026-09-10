@@ -1,65 +1,51 @@
-# Liga Universitaria - Sistema de gestión
+# Liga Universitaria - Sistema de Gestión
 
-## Descripción
+## Descripción de la aplicación
 
-La aplicación tiene como objetivo gestionar y consultar información de la Liga Universitaria de Futsal y Fútbol 11 de la UNICEN.
+El sistema tiene como objetivo gestionar y consultar información de la Liga Universitaria de Futsal y Fútbol 11 de la UNICEN.
 
 El usuario podrá consultar:
-
-- Equipos participantes y su división (A o B).
-- Jugadores pertenecientes a cada equipo.
-- Datos de los jugadores.
-- Partidos disputados.
-- Equipos local y visitante de cada partido.
-- Resultado y fecha de cada partido.
-
-En este TP se implementa la **capa de persistencia**, utilizando PostgreSQL como base de datos y `sqlc` para generar el código Go de acceso a los datos. La integración con el servidor web se realizará en etapas posteriores.
-
-## Tecnologías
-
-- Go
-- PostgreSQL
-- Docker y Docker Compose
-- SQL
-- sqlc
-- `database/sql`
-- `github.com/jackc/pgx/v5`
+- Los equipos participantes.
+- La división a la que pertenece cada equipo (A o B).
+- Los jugadores pertenecientes a cada equipo.
+- El nombre y apellido de los jugadores.
+- Los partidos disputados.
+- El equipo local y el equipo visitante de cada partido.
+- El resultado de cada partido.
+- La fecha de cada partido.
 
 ## Persistencia
 
-La base de datos está compuesta por tres tablas:
+La información se almacena en PostgreSQL. El acceso desde Go se realiza mediante `database/sql` y `pgx`.
 
-- `equipo`: equipos y división.
-- `jugador`: jugadores y equipo al que pertenecen.
-- `partido`: partidos, equipos participantes, resultado y fecha.
+El esquema y las consultas SQL se encuentran en `db/schema/schema.sql` y `db/queries/queries.sql`. `sqlc` genera el código Go para acceder a la base de datos.
 
-Relaciones:
+La documentación de persistencia se encuentra en `docs/persistencia.md`.
 
-- Un equipo puede tener muchos jugadores.
-- Un equipo puede participar en muchos partidos como local o visitante.
-- Cada jugador pertenece a un equipo.
-- Cada partido tiene un equipo local y uno visitante.
+## Tecnologías
 
-Las operaciones CRUD de estas entidades están definidas en `db/queries/queries.sql` y el esquema de la base de datos en `db/schema/schema.sql`.
-
-La documentación detallada de persistencia se encuentra en [`docs/persistencia.md`](docs/persistencia.md).
+- Go 
+- PostgreSQL 
+- Docker 
+- Docker Compose 
+- sqlc 
+- `database/sql`
+- `github.com/jackc/pgx/v5`
 
 ## Requisitos
 
-Se necesita tener instalado:
-
+Para ejecutar el proyecto se necesita:
 - Go 1.22.2 o superior.
 - Docker.
 - Docker Compose.
-- sqlc.
+- sqlc
 
-Docker debe estar iniciado para ejecutar las pruebas.
+## Ejecución y pruebas
 
-## Ejecución
+Desde la raíz del proyecto, ejecutar el siguiente comando en bash:
 
-El proyecto incluye un `Makefile` que automatiza la preparación del entorno y la ejecución de las pruebas.
+"make test"
 
-Desde la raíz del proyecto:
+Este comando genera el código con sqlc, compila el proyecto, elimina los contenedores y volúmenes anteriores, inicia PostgreSQL mediante Docker Compose, espera a que esté disponible, ejecuta las pruebas y finalmente elimina los contenedores y volúmenes.
 
-```bash
-make test
+Las pruebas se encuentran en db/sqlc/queries_test.go y utilizan el paquete testing de Go. Se verifica el funcionamiento de las operaciones CRUD de equipos, jugadores y partidos, comprobando la creación, consulta, listado, actualización y eliminación de registros.

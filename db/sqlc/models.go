@@ -4,9 +4,28 @@
 
 package db
 
+import (
+	"time"
+)
+
 type Equipo struct {
-	IDEquipo      int32  `json:"id_equipo"`
-	NombreEquipo  string `json:"nombre_equipo"`
-	CantJugadores int32  `json:"cant_jugadores"`
-	Division      string `json:"division"`
+	IDEquipo     int32  `json:"id_equipo"`
+	NombreEquipo string `json:"nombre_equipo"`
+	Division     string `json:"division"`
+}
+
+type Jugador struct {
+	IDJugador int32  `json:"id_jugador"`
+	Nombre    string `json:"nombre"`
+	Apellido  string `json:"apellido"`
+	IDEquipo  int32  `json:"id_equipo"`
+}
+
+type Partido struct {
+	IDPartido         int32     `json:"id_partido"`
+	IDEquipoLocal     int32     `json:"id_equipo_local"`
+	IDEquipoVisitante int32     `json:"id_equipo_visitante"`
+	GolesLocal        int32     `json:"goles_local"`
+	GolesVisitante    int32     `json:"goles_visitante"`
+	Fecha             time.Time `json:"fecha"`
 }

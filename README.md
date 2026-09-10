@@ -28,7 +28,8 @@ La documentación de persistencia se encuentra en `docs/persistencia.md`.
 - PostgreSQL 
 - Docker 
 - Docker Compose 
-- sqlc 
+- sqlc
+- make
 - `database/sql`
 - `github.com/jackc/pgx/v5`
 
@@ -39,6 +40,7 @@ Para ejecutar el proyecto se necesita:
 - Docker.
 - Docker Compose.
 - sqlc
+- make
 
 ## Ejecución y pruebas
 

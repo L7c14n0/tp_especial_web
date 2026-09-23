@@ -1,0 +1,2 @@
+#ignoramos el codigo autogenerado por sqlc para que el usuario que clone el repo cree sus propios archivos
+db/sqlc

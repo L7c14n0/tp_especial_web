@@ -1,10 +1,15 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	db "server-tp/servidor-tpespecial/db/sqlc"
+
+	_ "github.com/lib/pq"
 )
 
 func manejador404(fileServer http.Handler) http.Handler {
@@ -39,24 +44,51 @@ func manejador404(fileServer http.Handler) http.Handler {
 	})
 }
 
-func main() {
-	// 1. Define el directorio que contiene los archivos estáticos.
-	staticDir := "./static"
+type EquiposAPI struct {
+	Queries *db.Queries //puntero a la estructura generada por sqlc
+}
 
+func main() {
+	//creamos la conexion con la base de datos
+	dsn := "postgres://tp_user:tp_password@localhost:5432/tp_db?sslmode=disable"
+
+	//intentamos conectarnos a la base
+	conn, err := sql.Open("postgres", dsn)
+	if err != nil {
+		log.Fatalf("Error al preparar la conexión: %v", err)
+	}
+
+	//si logramos conectaros con la base, antes de que se cierre cualquier tipo de conexion, la cerramos
+	defer conn.Close()
+
+	//hacemos un ping para ver si podemos interactuar con la base de datos
+	if err := conn.Ping(); err != nil {
+		log.Fatalf("La BD rechazó la conexión: %v", err)
+	}
+
+	//si el ping pasa y no hay error, la conexion es un exito
+	fmt.Println("Conexión a PostgreSQL establecida con éxito.")
+
+	//instanciamos un repositorio usando el codigo autogenerado por sqlc
+	queries := db.New(conn)
+
+	//le damos a la API que creamos el repositorio que instanciamos para usar los datos de la bd
+	apiEquipos := &EquiposAPI{Queries: queries}
+
+	_ = apiEquipos //
+
+	staticDir := "./static"
 	fileServer := http.FileServer(http.Dir(staticDir))
 
-	// 3. Registra el manejador para que atienda todas las peticiones ("/").
-	// Usamos http.Handle porque fileServer es un http.Handler.
-
+	// Registramos la ruta raíz "/" para que sirva la página web.
+	// (Asegurate de tener tu función manejador404 en el proyecto)
 	http.Handle("/", manejador404(fileServer))
 
-	// 4. Define el puerto y muestra un mensaje.
 	port := ":8080"
-	fmt.Printf("Servidor ESTÁTICO escuchando en http://localhost%s\n", port)
-	fmt.Printf("Sirviendo archivos desde: %s\n", staticDir)
-	// 5. Inicia el servidor.
-	err := http.ListenAndServe(port, nil)
-	if err != nil {
-		fmt.Printf("Error al iniciar el servidor: %s\n", err)
+	fmt.Printf("Servidor Completo escuchando en http://localhost%s\n", port)
+	fmt.Printf("Sirviendo frontend desde: %s\n", staticDir)
+
+	if err := http.ListenAndServe(port, nil); err != nil {
+		log.Fatalf("Error al iniciar el servidor: %v", err)
 	}
 }

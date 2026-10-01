@@ -7,12 +7,12 @@ import (
 	"os"
 	"testing"
 
-	"server-tp/servidor-tpespecial/db/sqlc"
+	db "server-tp/servidor-tpespecial/db/sqlc"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-var testQueries *sqlc.Queries
+var testQueries *db.Queries
 var testDB *sql.DB
 
 func TestMain(m *testing.M) {
@@ -28,7 +28,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("No se pudo conectar a PostgreSQL: %v", err)
 	}
 
-	testQueries = sqlc.New(testDB)
+	testQueries = db.New(testDB)
 
 	code := m.Run()
 
@@ -36,13 +36,13 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-var equipoTest sqlc.Equipo
+var equipoTest db.Equipo
 
 func TestCreateEquipo(t *testing.T) {
 	ctx := context.Background()
 	var err error
 
-	equipoTest, err = testQueries.CreateEquipo(ctx, sqlc.CreateEquipoParams{
+	equipoTest, err = testQueries.CreateEquipo(ctx, db.CreateEquipoParams{
 		NombreEquipo: "Los Pumas",
 		Division:     "A",
 	})
@@ -70,7 +70,7 @@ func TestGetEquipo(t *testing.T) {
 func TestUpdateEquipo(t *testing.T) {
 	ctx := context.Background()
 
-	err := testQueries.UpdateEquipo(ctx, sqlc.UpdateEquipoParams{
+	err := testQueries.UpdateEquipo(ctx, db.UpdateEquipoParams{
 		IDEquipo:     equipoTest.IDEquipo,
 		NombreEquipo: "Los Pumas Actualizados",
 		Division:     "B",

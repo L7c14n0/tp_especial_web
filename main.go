@@ -31,14 +31,14 @@ func manejador404(fileServer http.Handler) http.Handler {
 			if os.IsNotExist(err) {
 				w.Header().Set("Content-Type", "text/html; charset=utf-8")
 				w.WriteHeader(http.StatusNotFound)
-				http.ServeFile(w, r, "./static/404.html")
+				htmlError, _ := os.ReadFile("./static/404.html")
+				w.Write(htmlError)
 				return
 			}
 
 			http.Error(w, "Error interno del servidor", http.StatusInternalServerError)
 			return
 		}
-
 		// Si existe y el método es válido, usamos FileServer
 		fileServer.ServeHTTP(w, r)
 	})
@@ -75,7 +75,11 @@ func main() {
 	//le damos a la API que creamos el repositorio que instanciamos para usar los datos de la bd
 	apiEquipos := &EquiposAPI{Queries: queries}
 
-	_ = apiEquipos //
+	http.HandleFunc("POST /api/equipos", apiEquipos.POSTEquipoHandler)
+	http.HandleFunc("GET /api/equipos", apiEquipos.GETEquiposHandler)
+	http.HandleFunc("GET /api/equipos/{id}", apiEquipos.GETEquipoHandler)
+	http.HandleFunc("PUT /api/equipos/{id}", apiEquipos.PUTEquipoHandler)
+	http.HandleFunc("DELETE /api/equipos/{id}", apiEquipos.DELETEEquipoHandler)
 
 	staticDir := "./static"
 	fileServer := http.FileServer(http.Dir(staticDir))
@@ -83,7 +87,6 @@ func main() {
 	// Registramos la ruta raíz "/" para que sirva la página web.
 	// (Asegurate de tener tu función manejador404 en el proyecto)
 	http.Handle("/", manejador404(fileServer))
-
 	port := ":8080"
 	fmt.Printf("Servidor Completo escuchando en http://localhost%s\n", port)
 	fmt.Printf("Sirviendo frontend desde: %s\n", staticDir)
